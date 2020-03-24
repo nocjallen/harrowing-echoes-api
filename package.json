@@ -9,6 +9,7 @@
   "author": "Jonathan Allen",
   "license": "MIT",
   "dependencies": {
-    "restify": "^8.5.1"
+    "restify": "^8.5.1",
+    "restify-cors-middleware": "^1.1.1"
   }
 }
