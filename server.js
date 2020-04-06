@@ -39,12 +39,27 @@ server.get('/maps', function (req, res) {
             grid: [['#','#','#','#','#','#','#','#','#'],
                   ['#','•','•','•','•','•','•','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
-                  ['#','•','•','•','@','•','•','•','#'],
+                  ['#','•','g','•','@','•','p','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
                   ['#','#','#','#','#','#','#','#','#']],
             title: mapName
           }
+        })
+      }
+    })
+  })
+})
+
+server.get('/name', function (req, res) {
+  db.serialize( () => {
+    db.get(`SELECT name FROM names ORDER BY RANDOM() LIMIT 1;`, (err, row) => {
+      if (err) {
+        console.error(err.message)
+      } else {
+        let name = row.name
+        res.send(200, {
+          name: name
         })
       }
     })
