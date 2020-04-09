@@ -1,8 +1,9 @@
 const corsMiddleware = require('restify-cors-middleware')
+const errors = require('restify-errors')
 const restify = require ('restify')
 const sqlite3 = require('sqlite3').verbose()
 
-const db = new sqlite3.Database('./echoes.db', sqlite3.OPEN_READONLY, (err) => {
+const db = new sqlite3.Database('./echoes.db', sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message)
   }
@@ -17,8 +18,11 @@ const cors = corsMiddleware({
 })
 
 const server = restify.createServer()
+
+//Restify Middleware
 server.pre(cors.preflight)
 server.use(cors.actual)
+server.use(restify.plugins.bodyParser())
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
@@ -66,8 +70,40 @@ server.get('/name', function (req, res) {
   })
 })
 
-server.get('/scores', function (req, res) {
-  res.send(200, {
-    scores: ["Chad the Lvl 1 commoner, killed by a giant."]
+server.get('/leaderboard', function (req, res) {
+  db.serialize( () => {
+    db.all(`SELECT * FROM leaderboard;`, (err, rows) => {
+      if (err) {
+        console.error(err.message)
+      } else {
+        res.send(200, {
+          leaderboard: rows
+        })
+      }
+    }
+    )
   })
+})
+
+server.post('/leaderboard', function (req, res, next) {
+  if (!req.is('application/json')) {
+    return next(new errors.InvalidContentError("This API expects: 'application/json'"))
+  }
+  let data = req.body
+  try {
+    db.serialize( () => {
+      db.run(`INSERT INTO leaderboard(name, message, score) VALUES(?,?,?)`, data.name, data.message, data.score, function(err) {
+        if (err) {
+          res.send(500)
+          return next(console.error(err.message))
+        } else {
+          res.send(201)
+          console.log("Updated leaderboard.")
+          next()
+        }
+      })
+    })
+  } catch (error) {
+    return next(new errors.InternalError(error.message))
+  }
 })
