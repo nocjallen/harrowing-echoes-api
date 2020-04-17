@@ -24,6 +24,7 @@ server.pre(cors.preflight)
 server.use(cors.actual)
 server.use(restify.plugins.bodyParser())
 
+//Restify Server
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 })
@@ -40,13 +41,27 @@ server.get('/maps', function (req, res) {
         let mapName = row.prefix + " " + row.map
         res.send(200, {
           level: {
-            grid: [['#','#','#','#','#','#','#','#','#'],
+            grid: [
+                  ['#','#','#','#','#','#','#','#','#'],
                   ['#','•','•','•','•','•','•','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
-                  ['#','•','g','•','@','•','p','•','#'],
+                  ['#','•','g','•','@','•','s','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
                   ['#','•','•','•','•','•','•','•','#'],
-                  ['#','#','#','#','#','#','#','#','#']],
+                  ['#','#','#','#','#','#','#','#','#']
+                ],
+            npcs: [
+              {
+                name: "goblin",
+                symbol: "g",
+                damage: 1,
+              },
+              { 
+                name: "spider",
+                symbol: "s",
+                damage: 1
+              }
+            ],
             title: mapName
           }
         })
