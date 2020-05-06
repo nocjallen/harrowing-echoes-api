@@ -31,6 +31,7 @@ server.listen(8080, function() {
 
 server.get('/maps', function (req, res) {
   db.serialize( () => {
+    //Generate a random map title by combining a random prefix and a random name from the database.
     db.get(`WITH
             prefix AS (SELECT * FROM (SELECT prefix FROM mapPrefixes AS prefix ORDER BY RANDOM() LIMIT 1)),
             map AS (SELECT * FROM (SELECT map FROM maps AS prefix ORDER BY RANDOM() LIMIT 1))
